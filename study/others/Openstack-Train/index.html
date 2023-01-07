@@ -1,0 +1,1651 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/fluid.png">
+  <link rel="icon" href="/img/fluid.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="Felix Cheung">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="Enviroment   hostname os static ip role    controller centos7.8 网卡1Nat模式静态10.10.10.101；网卡2仅主机模式不设IP，网关地址192.168.40.1 主控   computer centos7.8 网卡1Nat模式静态10.10.10.102；网卡2仅主机模式不设IP，网关地址192.168.40.1 计算   b">
+<meta property="og:type" content="article">
+<meta property="og:title" content="手动部署Train版OpenStack">
+<meta property="og:url" content="http://example.com/study/others/Openstack-Train/index.html">
+<meta property="og:site_name" content="Mucy&#39; Live">
+<meta property="og:description" content="Enviroment   hostname os static ip role    controller centos7.8 网卡1Nat模式静态10.10.10.101；网卡2仅主机模式不设IP，网关地址192.168.40.1 主控   computer centos7.8 网卡1Nat模式静态10.10.10.102；网卡2仅主机模式不设IP，网关地址192.168.40.1 计算   b">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2022-12-22T02:44:50.000Z">
+<meta property="article:modified_time" content="2023-01-07T08:42:39.779Z">
+<meta property="article:author" content="Felix Cheung">
+<meta name="twitter:card" content="summary_large_image">
+  
+  
+    <meta name="referrer" content="no-referrer-when-downgrade">
+  
+  
+  <title>手动部署Train版OpenStack - Mucy&#39; Live</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_hj8rtnfg7um.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"example.com","root":"/","version":"1.9.4","typing":{"enable":true,"typeSpeed":60,"cursorChar":"_","loop":true,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"follow_dnt":true,"baidu":null,"google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml"};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+
+  
+<meta name="generator" content="Hexo 6.3.0"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>Mucy</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                <span>首页</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>归档</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item dropdown">
+              <a class="nav-link dropdown-toggle" target="_self" href="javascript:;" role="button"
+                 data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                <i class="iconfont icon-category-fill"></i>
+                <span>学海无涯</span>
+              </a>
+              <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                
+                  
+                  
+                  
+                  <a class="dropdown-item" href="/study/kubernetes">
+                    
+                    <span>K8S</span>
+                  </a>
+                
+                  
+                  
+                  
+                  <a class="dropdown-item" href="/study/others">
+                    
+                    <span>others</span>
+                  </a>
+                
+              </div>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item dropdown">
+              <a class="nav-link dropdown-toggle" target="_self" href="javascript:;" role="button"
+                 data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                <i class="iconfont icon-category-fill"></i>
+                <span>胡言乱语</span>
+              </a>
+              <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                
+                  
+                  
+                  
+                  <a class="dropdown-item" href="/gibberish/tipsy">
+                    
+                    <span>浅斟集</span>
+                  </a>
+                
+              </div>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                <span>分类</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                <span>关于</span>
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/bg.jpg') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="手动部署Train版OpenStack"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2022-12-22 10:44" pubdate>
+          2022年12月22日 上午
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          25k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          206 分钟
+        
+      </span>
+    
+
+    
+    
+      
+        <span id="busuanzi_container_page_pv" style="display: none">
+          <i class="iconfont icon-eye" aria-hidden="true"></i>
+          <span id="busuanzi_value_page_pv"></span> 次
+        </span>
+        
+      
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <!-- SEO header -->
+            <h1 style="display: none">手动部署Train版OpenStack</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <h1 id="Enviroment"><a href="#Enviroment" class="headerlink" title="Enviroment"></a>Enviroment</h1><table>
+<thead>
+<tr>
+<th align="center">hostname</th>
+<th align="center">os</th>
+<th align="center">static ip</th>
+<th align="center">role</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center">controller</td>
+<td align="center">centos7.8</td>
+<td align="center">网卡1Nat模式静态10.10.10.101；网卡2仅主机模式不设IP，网关地址192.168.40.1</td>
+<td align="center">主控</td>
+</tr>
+<tr>
+<td align="center">computer</td>
+<td align="center">centos7.8</td>
+<td align="center">网卡1Nat模式静态10.10.10.102；网卡2仅主机模式不设IP，网关地址192.168.40.1</td>
+<td align="center">计算</td>
+</tr>
+<tr>
+<td align="center">block</td>
+<td align="center">centos7.8</td>
+<td align="center">10.10.10.103</td>
+<td align="center">块储存，双硬盘</td>
+</tr>
+</tbody></table>
+<h1 id="Prerequisites"><a href="#Prerequisites" class="headerlink" title="Prerequisites"></a>Prerequisites</h1><div class="code-wrapper"><pre><code class="hljs shell"><span class="hljs-meta prompt_">#</span><span class="language-bash">临时关闭防火墙</span>
+systemctl stop firewalld
+<span class="hljs-meta prompt_">#</span><span class="language-bash">禁用防火墙，重启生效</span>
+systemctl disable firewalld
+<span class="hljs-meta prompt_"></span>
+<span class="hljs-meta prompt_">#</span><span class="language-bash">临时关闭selinux</span>
+setenforce 0
+<span class="hljs-meta prompt_">#</span><span class="language-bash">禁用selinux,重启生效</span>
+sed -i &quot;s/enforcing/disabled/g&quot; /etc/selinux/config
+<span class="hljs-meta prompt_"></span>
+<span class="hljs-meta prompt_">#</span><span class="language-bash">安装常用软件包</span>
+yum install vim net-tools lrzsz unzip dos2unix telnet sysstat iotop pciutils lsof tcpdump psmisc bc wget socat gcc tree chrony ntpdate -y
+<span class="hljs-meta prompt_"></span>
+<span class="hljs-meta prompt_">#</span><span class="language-bash">主机名写入hosts</span>
+sed -i &#x27;$a\10.10.10.101 controller\n10.10.10.102 compute\n10.10.10.103 block&#x27; /etc/hosts
+<span class="hljs-meta prompt_"></span>
+<span class="hljs-meta prompt_">#</span><span class="language-bash">主机间配置ssh免密登录</span>
+ssh-keygen -t rsa
+for host in master backup node ; do ssh-copy-id -i ~/.ssh/id_rsa.pub $host;done</code></pre></div>
+
+<h2 id="Network-Time-Protoco"><a href="#Network-Time-Protoco" class="headerlink" title="Network Time Protoco"></a><a target="_blank" rel="noopener" href="https://docs.openstack.org/install-guide/environment-ntp.html#">Network Time Protoco</a></h2><h3 id="controller"><a href="#controller" class="headerlink" title="controller"></a>controller</h3><div class="code-wrapper"><pre><code class="hljs shell">yum install chrony -y
+
+vim /etc/chrony.conf
+allow 10.10.0.0/16 (主控节点网段)
+
+for op in enable restart status;do systemctl $op chronyd;done</code></pre></div>
+
+<h3 id="computer-block"><a href="#computer-block" class="headerlink" title="computer,block"></a>computer,block</h3><div class="code-wrapper"><pre><code class="hljs shell">yum install chrony -y
+
+vim /etc/chrony.conf
+server controller iburst
+
+for op in enable restart status;do systemctl $op chronyd;done</code></pre></div>
+
+<h2 id="OpenStack-packages"><a href="#OpenStack-packages" class="headerlink" title="OpenStack packages"></a><a target="_blank" rel="noopener" href="https://docs.openstack.org/install-guide/environment-packages.html#">OpenStack packages</a></h2><div class="code-wrapper"><pre><code class="hljs shell">yum list centos-release-openstack*
+yum install centos-release-openstack-train -y
+yum upgrade -y
+yum install python-openstackclient openstack-selinux -y</code></pre></div>
+
+<h2 id="SQL-database"><a href="#SQL-database" class="headerlink" title="SQL database"></a><a target="_blank" rel="noopener" href="https://docs.openstack.org/install-guide/environment-sql-database.html">SQL database</a></h2><div class="code-wrapper"><pre><code class="hljs shell">yum install mariadb mariadb-server python2-PyMySQL -y
+
+vim /etc/my.cnf.d/openstack.conf
+[mysqld]
+bind-address = 10.10.10.101
+
+default-storage-engine = innodb
+innodb_file_per_table = on
+max_connections = 4096
+collation-server = utf8_general_ci
+character-set-server = utf8
+
+for op in enable start status;do systemctl $op mariadb;done
+<span class="hljs-meta prompt_"></span>
+<span class="hljs-meta prompt_">#</span><span class="language-bash">数据库初始化，需要设置密码</span>
+mysql_secure_installation</code></pre></div>
+
+<h2 id="Message-queue"><a href="#Message-queue" class="headerlink" title="Message queue"></a><a target="_blank" rel="noopener" href="https://docs.openstack.org/install-guide/environment-messaging.html">Message queue</a></h2><div class="code-wrapper"><pre><code class="hljs shell">yum install rabbitmq-server -y
+
+for op in enable start status;do systemctl $op rabbitmq-server;done
+
+rabbitmqctl add_user openstack openstack
+
+rabbitmqctl set_permissions openstack &quot;.*&quot; &quot;.*&quot; &quot;.*&quot;
+<span class="hljs-meta prompt_"></span>
+<span class="hljs-meta prompt_">#</span><span class="language-bash">安装可视化插件</span>
+rabbitmq-plugins enable rabbitmq-management
+systemctl restart rabbitmq-server
+<span class="hljs-meta prompt_"></span>
+<span class="hljs-meta prompt_">#</span><span class="language-bash">访问http://主控节点IP:15672/，登录账户guest/guest，将刚建的openstack用户加入到管理组</span></code></pre></div>
+
+<h2 id="Memcached"><a href="#Memcached" class="headerlink" title="Memcached"></a><a target="_blank" rel="noopener" href="https://docs.openstack.org/install-guide/environment-memcached.html">Memcached</a></h2><div class="code-wrapper"><pre><code class="hljs shell">yum install memcached python-memcached -y
+
+sed -i &#x27;s/127.0.0.1/10.10.10.101/&#x27; /etc/sysconfig/memcached
+
+for op in enable start status;do systemctl $op memcached;done</code></pre></div>
+
+<h2 id="Etcd"><a href="#Etcd" class="headerlink" title="Etcd"></a><a target="_blank" rel="noopener" href="https://docs.openstack.org/install-guide/environment-etcd.html">Etcd</a></h2><div class="code-wrapper"><pre><code class="hljs shell">yum install etcd -y
+
+vim /etc/etcd/etcd.conf
+<span class="hljs-meta prompt_">#</span><span class="language-bash">[Member]</span>
+ETCD_DATA_DIR=&quot;/var/lib/etcd/default.etcd&quot;
+ETCD_LISTEN_PEER_URLS=&quot;http://10.10.10.101:2380&quot;
+ETCD_LISTEN_CLIENT_URLS=&quot;http://10.10.10.101:2379&quot;
+ETCD_NAME=&quot;controller&quot;
+<span class="hljs-meta prompt_">#</span><span class="language-bash">[Clustering]</span>
+ETCD_INITIAL_ADVERTISE_PEER_URLS=&quot;http://10.10.10.101:2380&quot;
+ETCD_ADVERTISE_CLIENT_URLS=&quot;http://10.10.10.101:2379&quot;
+ETCD_INITIAL_CLUSTER=&quot;controller=http://10.10.10.101:2380&quot;
+ETCD_INITIAL_CLUSTER_TOKEN=&quot;etcd-cluster-01&quot;
+ETCD_INITIAL_CLUSTER_STATE=&quot;new&quot;
+
+for op in enable start status;do systemctl $op etcd;done</code></pre></div>
+
+<h1 id="Keystone-installation-for-Train"><a href="#Keystone-installation-for-Train" class="headerlink" title="Keystone installation for Train"></a><a target="_blank" rel="noopener" href="https://docs.openstack.org/keystone/train/install/">Keystone installation for Train</a></h1><h2 id="Prerequisites-1"><a href="#Prerequisites-1" class="headerlink" title="Prerequisites"></a>Prerequisites</h2><div class="code-wrapper"><pre><code class="hljs shell">mysql -u root -p123456
+
+CREATE DATABASE keystone;
+
+GRANT ALL PRIVILEGES ON keystone.* TO &#x27;keystone&#x27;@&#x27;localhost&#x27; IDENTIFIED BY &#x27;keystone&#x27;;
+GRANT ALL PRIVILEGES ON keystone.* TO &#x27;keystone&#x27;@&#x27;%&#x27; IDENTIFIED BY &#x27;keystone&#x27;;
+
+exit;</code></pre></div>
+
+<h2 id="Install-and-configure-components"><a href="#Install-and-configure-components" class="headerlink" title="Install and configure components"></a>Install and configure components</h2><div class="code-wrapper"><pre><code class="hljs shell">yum install openstack-keystone httpd mod_wsgi -y
+
+cp /etc/keystone/keystone.conf /etc/keystone/keystone.conf.bak
+
+vim /etc/keystone/keystone.conf
+[database]
+connection = mysql+pymysql://keystone:keystone@controller/keystone
+[token]
+provider = fernet
+
+su -s /bin/sh -c &quot;keystone-manage db_sync&quot; keystone
+
+keystone-manage fernet_setup --keystone-user keystone --keystone-group keystone
+keystone-manage credential_setup --keystone-user keystone --keystone-group keystone
+
+keystone-manage bootstrap --bootstrap-password admin(管理员密码) \
+  --bootstrap-admin-url http://controller:5000/v3/ \
+  --bootstrap-internal-url http://controller:5000/v3/ \
+  --bootstrap-public-url http://controller:5000/v3/ \
+  --bootstrap-region-id RegionOne</code></pre></div>
+
+<h2 id="Configure-the-Apache-HTTP-server"><a href="#Configure-the-Apache-HTTP-server" class="headerlink" title="Configure the Apache HTTP server"></a>Configure the Apache HTTP server</h2><div class="code-wrapper"><pre><code class="hljs shell">vim /etc/httpd/conf/httpd.conf
+ServerName controller(主机名)
+
+ln -s /usr/share/keystone/wsgi-keystone.conf /etc/httpd/conf.d/</code></pre></div>
+
+<h2 id="Finalize-the-installation"><a href="#Finalize-the-installation" class="headerlink" title="Finalize the installation"></a>Finalize the installation</h2><div class="code-wrapper"><pre><code class="hljs shell">for op in enable start status;do systemctl $op httpd;done
+
+vim admin-openrc
+export OS_USERNAME=admin
+export OS_PASSWORD=Aadmin(管理员密码)
+export OS_PROJECT_NAME=admin
+export OS_USER_DOMAIN_NAME=Default
+export OS_PROJECT_DOMAIN_NAME=Default
+export OS_AUTH_URL=http://controller:5000/v3
+export OS_IDENTITY_API_VERSION=3
+
+source admin-openrc</code></pre></div>
+
+<h2 id="Create-a-domain-projects-users-and-roles"><a href="#Create-a-domain-projects-users-and-roles" class="headerlink" title="Create a domain, projects, users, and roles"></a>Create a domain, projects, users, and roles</h2><div class="code-wrapper"><pre><code class="hljs shell">openstack domain create --description &quot;An Example Domain&quot; example
+
+openstack project create --domain default \
+  --description &quot;Service Project&quot; service
+
+openstack project create --domain default \
+  --description &quot;Demo Project&quot; myproject
+<span class="hljs-meta prompt_"></span>
+<span class="hljs-meta prompt_">#</span><span class="language-bash">设置普通用户密码</span>
+openstack user create --domain default \
+  --password-prompt myuser
+
+openstack role create myrole
+
+openstack role add --project myproject --user myuser myrole</code></pre></div>
+
+<h2 id="Verify-operation"><a href="#Verify-operation" class="headerlink" title="Verify operation"></a>Verify operation</h2><div class="code-wrapper"><pre><code class="hljs shell">unset OS_AUTH_URL OS_PASSWORD
+
+openstack --os-auth-url http://controller:5000/v3 \
+  --os-project-domain-name Default --os-user-domain-name Default \
+  --os-project-name admin --os-username admin token issue
+
+openstack --os-auth-url http://controller:5000/v3 \
+  --os-project-domain-name Default --os-user-domain-name Default \
+  --os-project-name myproject --os-username myuser token issue
+
+vim demo-openrc
+export OS_PROJECT_DOMAIN_NAME=Default
+export OS_USER_DOMAIN_NAME=Default
+export OS_PROJECT_NAME=myproject
+export OS_USERNAME=myuser
+export OS_PASSWORD=demo(普通用户密码)
+export OS_AUTH_URL=http://controller:5000/v3
+export OS_IDENTITY_API_VERSION=3
+export OS_IMAGE_API_VERSION=2
+<span class="hljs-meta prompt_"></span>
+<span class="hljs-meta prompt_">#</span><span class="language-bash">查看普通用户token信息</span>
+source demo-openrc
+openstack token issue
+<span class="hljs-meta prompt_"></span>
+<span class="hljs-meta prompt_">#</span><span class="language-bash">查看管理员token信息</span>
+source admin-openrc
+openstack token issue</code></pre></div>
+
+<h1 id="Glance-installation-for-Train"><a href="#Glance-installation-for-Train" class="headerlink" title="Glance installation for Train"></a><a target="_blank" rel="noopener" href="https://docs.openstack.org/glance/train/install/">Glance installation for Train</a></h1><h2 id="Prerequisites-2"><a href="#Prerequisites-2" class="headerlink" title="Prerequisites"></a>Prerequisites</h2><h3 id="Create-Database"><a href="#Create-Database" class="headerlink" title="Create Database"></a>Create Database</h3><div class="code-wrapper"><pre><code class="hljs shell">mysql -u root -p123456
+
+CREATE DATABASE glance;
+
+GRANT ALL PRIVILEGES ON glance.* TO &#x27;glance&#x27;@&#x27;localhost&#x27; \
+  IDENTIFIED BY &#x27;glance&#x27;;
+GRANT ALL PRIVILEGES ON glance.* TO &#x27;glance&#x27;@&#x27;%&#x27; \
+  IDENTIFIED BY &#x27;glance&#x27;;
+
+exit;</code></pre></div>
+
+<h3 id="Configure-User-and-Endpoints"><a href="#Configure-User-and-Endpoints" class="headerlink" title="Configure User and Endpoints"></a>Configure User and Endpoints</h3><div class="code-wrapper"><pre><code class="hljs shell">. admin-openrc
+<span class="hljs-meta prompt_"></span>
+<span class="hljs-meta prompt_">#</span><span class="language-bash">设置glance用户密码</span>
+openstack user create --domain default --password-prompt glance
+
+openstack role add --project service --user glance admin
+
+openstack service create --name glance \
+  --description &quot;OpenStack Image&quot; image
+
+openstack endpoint create --region RegionOne \
+  image public http://controller:9292  
+openstack endpoint create --region RegionOne \
+  image internal http://controller:9292  
+openstack endpoint create --region RegionOne \
+  image admin http://controller:9292</code></pre></div>
+
+<h2 id="Install-and-configure-components-1"><a href="#Install-and-configure-components-1" class="headerlink" title="Install and configure components"></a>Install and configure components</h2><div class="code-wrapper"><pre><code class="hljs shell">yum install openstack-glance -y
+
+cp /etc/glance/glance-api.conf /etc/glance/glance-api.conf.bak
+vim /etc/glance/glance-api.conf
+[database]
+connection = mysql+pymysql://glance:glance@controller/glance
+[keystone_authtoken]
+www_authenticate_uri  = http://controller:5000
+auth_url = http://controller:5000
+memcached_servers = controller:11211
+auth_type = password
+project_domain_name = Default
+user_domain_name = Default
+project_name = service
+username = glance
+password = glance(glance用户密码)
+[paste_deploy]
+flavor = keystone
+[glance_store]
+stores = file,http
+default_store = file
+filesystem_store_datadir = /var/lib/glance/images/
+
+su -s /bin/sh -c &quot;glance-manage db_sync&quot; glance
+
+for op in enable start status;do systemctl $op openstack-glance-api;done</code></pre></div>
+
+<h2 id="Verify-operation-1"><a href="#Verify-operation-1" class="headerlink" title="Verify operation"></a>Verify operation</h2><div class="code-wrapper"><pre><code class="hljs shell">wget http://download.cirros-cloud.net/0.4.0/cirros-0.4.0-x86_64-disk.img
+
+glance image-create --name &quot;cirros&quot; \
+  --file cirros-0.4.0-x86_64-disk.img \
+  --disk-format qcow2 --container-format bare \
+  --visibility public
+
+glance image-create --name &quot;Centos7&quot; \
+  --file CentOS-7-x86_64-GenericCloud-2003.qcow2c \
+  --disk-format qcow2 --container-format bare \
+  --visibility public
+
+openstack images list</code></pre></div>
+
+<h1 id="Placement-installation-for-Train"><a href="#Placement-installation-for-Train" class="headerlink" title="Placement installation for Train"></a><a target="_blank" rel="noopener" href="https://docs.openstack.org/placement/train/install/">Placement installation for Train</a></h1><h2 id="Prerequisites-3"><a href="#Prerequisites-3" class="headerlink" title="Prerequisites"></a>Prerequisites</h2><h3 id="Create-Database-1"><a href="#Create-Database-1" class="headerlink" title="Create Database"></a>Create Database</h3><div class="code-wrapper"><pre><code class="hljs shell">mysql -u root -p123456
+
+CREATE DATABASE placement;
+
+GRANT ALL PRIVILEGES ON placement.* TO &#x27;placement&#x27;@&#x27;localhost&#x27; \
+  IDENTIFIED BY &#x27;placement&#x27;;
+GRANT ALL PRIVILEGES ON placement.* TO &#x27;placement&#x27;@&#x27;%&#x27; \
+  IDENTIFIED BY &#x27;placement&#x27;;
+
+exit</code></pre></div>
+
+<h3 id="Configure-User-and-Endpoints-1"><a href="#Configure-User-and-Endpoints-1" class="headerlink" title="Configure User and Endpoints"></a>Configure User and Endpoints</h3><div class="code-wrapper"><pre><code class="hljs shell">. admin-openrc
+<span class="hljs-meta prompt_"></span>
+<span class="hljs-meta prompt_">#</span><span class="language-bash">设置placement用户密码</span>
+openstack user create --domain default --password-prompt placement
+
+openstack role add --project service --user placement admin
+
+openstack service create --name placement \
+  --description &quot;Placement API&quot; placement
+
+openstack endpoint create --region RegionOne \
+  placement public http://controller:8778
+openstack endpoint create --region RegionOne \
+  placement internal http://controller:8778
+openstack endpoint create --region RegionOne \
+  placement admin http://controller:8778</code></pre></div>
+
+<h2 id="Install-and-configure-components-2"><a href="#Install-and-configure-components-2" class="headerlink" title="Install and configure components"></a>Install and configure components</h2><div class="code-wrapper"><pre><code class="hljs shell">yum install openstack-placement-api -y
+
+cp /etc/placement/placement.conf /etc/placement/placement.conf.bak
+vim /etc/placement/placement.conf
+[placement_database]
+connection = mysql+pymysql://placement:placement@controller/placement
+[api]
+auth_strategy = keystone
+[keystone_authtoken]
+auth_url = http://controller:5000/v3
+memcached_servers = controller:11211
+auth_type = password
+project_domain_name = Default
+user_domain_name = Default
+project_name = service
+username = placement
+password = placement(placement用户密码)
+
+su -s /bin/sh -c &quot;placement-manage db sync&quot; placement
+
+systemctl restart httpd &amp; systemctl status httpd</code></pre></div>
+
+<h2 id="Verify-operation-2"><a href="#Verify-operation-2" class="headerlink" title="Verify operation"></a>Verify operation</h2><div class="code-wrapper"><pre><code class="hljs shell">. admin-openrc
+
+placement-status upgrade check
+
+yum install epel-release -y
+yum install -y python-pip
+pip install --upgrade pip
+pip install osc-placement
+
+openstack --os-placement-api-version 1.2 resource class list --sort-column name
+openstack --os-placement-api-version 1.6 trait list --sort-column name</code></pre></div>
+
+<h1 id="Nova-installation-for-Train"><a href="#Nova-installation-for-Train" class="headerlink" title="Nova installation for Train"></a><a target="_blank" rel="noopener" href="https://docs.openstack.org/nova/train/install/">Nova installation for Train</a></h1><h2 id="controller-1"><a href="#controller-1" class="headerlink" title="controller"></a>controller</h2><h3 id="Prerequisites-4"><a href="#Prerequisites-4" class="headerlink" title="Prerequisites"></a>Prerequisites</h3><h4 id="Create-Database-2"><a href="#Create-Database-2" class="headerlink" title="Create Database"></a>Create Database</h4><div class="code-wrapper"><pre><code class="hljs shell">mysql -u root -p123456
+
+CREATE DATABASE nova_api;
+CREATE DATABASE nova;
+CREATE DATABASE nova_cell0;
+
+GRANT ALL PRIVILEGES ON nova_api.* TO &#x27;nova&#x27;@&#x27;localhost&#x27; \
+  IDENTIFIED BY &#x27;nova&#x27;;
+GRANT ALL PRIVILEGES ON nova_api.* TO &#x27;nova&#x27;@&#x27;%&#x27; \
+  IDENTIFIED BY &#x27;nova&#x27;;
+
+GRANT ALL PRIVILEGES ON nova.* TO &#x27;nova&#x27;@&#x27;localhost&#x27; \
+  IDENTIFIED BY &#x27;nova&#x27;;
+GRANT ALL PRIVILEGES ON nova.* TO &#x27;nova&#x27;@&#x27;%&#x27; \
+  IDENTIFIED BY &#x27;nova&#x27;;
+
+GRANT ALL PRIVILEGES ON nova_cell0.* TO &#x27;nova&#x27;@&#x27;localhost&#x27; \
+  IDENTIFIED BY &#x27;nova&#x27;;
+GRANT ALL PRIVILEGES ON nova_cell0.* TO &#x27;nova&#x27;@&#x27;%&#x27; \
+  IDENTIFIED BY &#x27;nova&#x27;;
+
+exit;</code></pre></div>
+
+<h4 id="Configure-User-and-Endpoints-2"><a href="#Configure-User-and-Endpoints-2" class="headerlink" title="Configure User and Endpoints"></a>Configure User and Endpoints</h4><div class="code-wrapper"><pre><code class="hljs shell">. admin-openrc
+<span class="hljs-meta prompt_"></span>
+<span class="hljs-meta prompt_">#</span><span class="language-bash">设置nova用户密码</span>
+openstack user create --domain default --password-prompt nova
+
+openstack role add --project service --user nova admin
+
+openstack service create --name nova \
+  --description &quot;OpenStack Compute&quot; compute
+
+openstack endpoint create --region RegionOne \
+  compute public http://controller:8774/v2.1
+openstack endpoint create --region RegionOne \
+  compute internal http://controller:8774/v2.1
+openstack endpoint create --region RegionOne \
+  compute admin http://controller:8774/v2.1</code></pre></div>
+
+<h3 id="Install-and-configure-components-3"><a href="#Install-and-configure-components-3" class="headerlink" title="Install and configure components"></a>Install and configure components</h3><div class="code-wrapper"><pre><code class="hljs shell">yum install openstack-nova-api openstack-nova-conductor \
+  openstack-nova-novncproxy openstack-nova-scheduler -y
+cp /etc/nova/nova.conf /etc/nova/nova.conf.bak
+vim /etc/nova/nova.conf
+[DEFAULT]
+enabled_apis = osapi_compute,metadata
+transport_url = rabbit://openstack:openstack@controller:5672/
+my_ip = 10.10.10.101(主控节点IP)
+use_neutron = true
+firewall_driver = nova.virt.firewall.NoopFirewallDriver
+
+[api_database]
+connection = mysql+pymysql://nova:nova@controller/nova_api
+
+[database]
+connection = mysql+pymysql://nova:nova@controller/nova
+
+[api]
+auth_strategy = keystone
+
+[keystone_authtoken]
+www_authenticate_uri = http://controller:5000/
+auth_url = http://controller:5000/
+memcached_servers = controller:11211
+auth_type = password
+project_domain_name = Default
+user_domain_name = Default
+project_name = service
+username = nova
+password = nova(nova用户密码)
+
+[vnc]
+enabled = true
+server_listen = $my_ip
+server_proxyclient_address = $my_ip
+
+[glance]
+api_servers = http://controller:9292
+
+[oslo_concurrency]
+lock_path = /var/lib/nova/tmp
+
+[placement]
+region_name = RegionOne
+project_domain_name = Default
+project_name = service
+auth_type = password
+user_domain_name = Default
+auth_url = http://controller:5000/v3
+username = placement
+password = placement(placement用户密码)
+
+[scheduler]
+discover_hosts_in_cells_interval = 300
+
+vim /etc/httpd/conf.d/00-nova-placement-api.conf
+&lt;Directory /usr/bin&gt;
+   &lt;IfVersion &gt;= 2.4&gt;
+      Require all granted
+   &lt;/IfVersion&gt;
+   &lt;IfVersion &lt; 2.4&gt;
+      Order allow,deny
+      Allow from all
+   &lt;/IfVersion&gt;
+&lt;/Directory&gt;
+
+su -s /bin/sh -c &quot;nova-manage api_db sync&quot; nova
+su -s /bin/sh -c &quot;nova-manage cell_v2 map_cell0&quot; nova
+su -s /bin/sh -c &quot;nova-manage cell_v2 create_cell --name=cell1 --verbose&quot; nova
+su -s /bin/sh -c &quot;nova-manage db sync&quot; nova
+su -s /bin/sh -c &quot;nova-manage cell_v2 list_cells&quot; nova
+
+for op in enable satrt status;do for service in openstack-nova-api openstack-nova-scheduler openstack-nova-conductor openstack-nova-novncproxy;do systemctl $op $service;done;done</code></pre></div>
+
+<h2 id="compute"><a href="#compute" class="headerlink" title="compute"></a>compute</h2><h3 id="Install-and-configure-components-4"><a href="#Install-and-configure-components-4" class="headerlink" title="Install and configure components"></a>Install and configure components</h3><div class="code-wrapper"><pre><code class="hljs shell">yum install openstack-nova-compute libvirt -y
+
+cp /etc/nova/nova.conf /etc/nova/nova.conf.bak
+vim /etc/nova/nova.conf
+[DEFAULT]
+enabled_apis = osapi_compute,metadata
+transport_url = rabbit://openstack:openstack@controller
+my_ip = 10.10.10.102(计算节点IP)
+use_neutron = true
+firewall_driver = nova.virt.firewall.NoopFirewallDriver
+
+[api]
+auth_strategy = keystone
+
+[keystone_authtoken]
+www_authenticate_uri = http://controller:5000/
+auth_url = http://controller:5000/
+memcached_servers = controller:11211
+auth_type = password
+project_domain_name = Default
+user_domain_name = Default
+project_name = service
+username = nova
+password = nova(nova用户密码)
+
+[vnc]
+enabled = true
+server_listen = 0.0.0.0
+server_proxyclient_address = $my_ip
+novncproxy_base_url = http://controller:6080/vnc_auto.html
+
+[glance]
+api_servers = http://controller:9292
+
+[oslo_concurrency]
+lock_path = /var/lib/nova/tmp
+
+[placement]
+region_name = RegionOne
+project_domain_name = Default
+project_name = service
+auth_type = password
+user_domain_name = Default
+auth_url = http://controller:5000/v3
+username = placement
+password = placement(placement用户密码)
+
+[libvirt]
+cpu_mode = none
+virt_type=qemu
+
+
+for op in enable satrt status;do for service in libvirtd openstack-nova-compute;do systemctl $op $service;done;done</code></pre></div>
+
+<h2 id="controller-2"><a href="#controller-2" class="headerlink" title="controller"></a>controller</h2><h3 id="Verify-operation-3"><a href="#Verify-operation-3" class="headerlink" title="Verify operation"></a>Verify operation</h3><div class="code-wrapper"><pre><code class="hljs shell">. admin-openrc
+openstack compute service list
+su -s /bin/sh -c &quot;nova-manage cell_v2 discover_hosts --verbose&quot; nova</code></pre></div>
+
+<h1 id="Neutron-installation-for-Train"><a href="#Neutron-installation-for-Train" class="headerlink" title="Neutron installation for Train"></a><a target="_blank" rel="noopener" href="https://docs.openstack.org/neutron/train/install/">Neutron installation for Train</a></h1><h2 id="controller-3"><a href="#controller-3" class="headerlink" title="controller"></a>controller</h2><h3 id="Prerequisites-5"><a href="#Prerequisites-5" class="headerlink" title="Prerequisites"></a>Prerequisites</h3><h4 id="Create-Database-3"><a href="#Create-Database-3" class="headerlink" title="Create Database"></a>Create Database</h4><div class="code-wrapper"><pre><code class="hljs shell">mysql -u root -p123456
+
+CREATE DATABASE neutron;
+
+GRANT ALL PRIVILEGES ON neutron.* TO &#x27;neutron&#x27;@&#x27;localhost&#x27; \
+  IDENTIFIED BY &#x27;neutron&#x27;;
+GRANT ALL PRIVILEGES ON neutron.* TO &#x27;neutron&#x27;@&#x27;%&#x27; \
+  IDENTIFIED BY &#x27;neutron&#x27;;
+
+exit;</code></pre></div>
+
+<h4 id="Configure-User-and-Endpoints-3"><a href="#Configure-User-and-Endpoints-3" class="headerlink" title="Configure User and Endpoints"></a>Configure User and Endpoints</h4><div class="code-wrapper"><pre><code class="hljs shell">. admin-openrc
+<span class="hljs-meta prompt_"></span>
+<span class="hljs-meta prompt_">#</span><span class="language-bash">设置neutron用户密码</span>
+openstack user create --domain default --password-prompt neutron
+
+openstack role add --project service --user neutron admin
+
+openstack service create --name neutron \
+  --description &quot;OpenStack Networking&quot; network
+
+openstack endpoint create --region RegionOne \
+  network public http://controller:9696
+openstack endpoint create --region RegionOne \
+  network internal http://controller:9696
+openstack endpoint create --region RegionOne \
+  network admin http://controller:9696</code></pre></div>
+
+<h3 id="Install-and-configure-components-5"><a href="#Install-and-configure-components-5" class="headerlink" title="Install and configure components"></a>Install and configure components</h3><div class="code-wrapper"><pre><code class="hljs shell">yum install openstack-neutron openstack-neutron-ml2 \
+  openstack-neutron-linuxbridge ebtables -y</code></pre></div>
+
+<h4 id="Provider-networks"><a href="#Provider-networks" class="headerlink" title="Provider networks"></a><a target="_blank" rel="noopener" href="https://docs.openstack.org/neutron/train/install/controller-install-option1-rdo.html">Provider networks</a></h4><h5 id="vim-x2F-etc-x2F-neutron-x2F-neutron-conf"><a href="#vim-x2F-etc-x2F-neutron-x2F-neutron-conf" class="headerlink" title="vim &#x2F;etc&#x2F;neutron&#x2F;neutron.conf"></a>vim &#x2F;etc&#x2F;neutron&#x2F;neutron.conf</h5><div class="code-wrapper"><pre><code class="hljs properties"><span class="hljs-attr">[database]</span>
+<span class="hljs-attr">connection</span> = <span class="hljs-string">mysql+pymysql://neutron:neutron@controller/neutron</span>
+
+<span class="hljs-attr">[DEFAULT]</span>
+<span class="hljs-attr">core_plugin</span> = <span class="hljs-string">ml2</span>
+<span class="hljs-attr">service_plugins</span> =<span class="hljs-string"></span>
+<span class="hljs-attr">transport_url</span> = <span class="hljs-string">rabbit://openstack:openstack@controller</span>
+<span class="hljs-attr">auth_strategy</span> = <span class="hljs-string">keystone</span>
+<span class="hljs-attr">notify_nova_on_port_status_changes</span> = <span class="hljs-string">true</span>
+<span class="hljs-attr">notify_nova_on_port_data_changes</span> = <span class="hljs-string">true</span>
+
+<span class="hljs-attr">[keystone_authtoken]</span>
+<span class="hljs-attr">www_authenticate_uri</span> = <span class="hljs-string">http://controller:5000</span>
+<span class="hljs-attr">auth_url</span> = <span class="hljs-string">http://controller:5000</span>
+<span class="hljs-attr">memcached_servers</span> = <span class="hljs-string">controller:11211</span>
+<span class="hljs-attr">auth_type</span> = <span class="hljs-string">password</span>
+<span class="hljs-attr">project_domain_name</span> = <span class="hljs-string">default</span>
+<span class="hljs-attr">user_domain_name</span> = <span class="hljs-string">default</span>
+<span class="hljs-attr">project_name</span> = <span class="hljs-string">service</span>
+<span class="hljs-attr">username</span> = <span class="hljs-string">neutron</span>
+<span class="hljs-attr">password</span> = <span class="hljs-string">neutron(neutron用户密码)</span>
+
+<span class="hljs-attr">[nova]</span>
+<span class="hljs-attr">auth_url</span> = <span class="hljs-string">http://controller:5000</span>
+<span class="hljs-attr">auth_type</span> = <span class="hljs-string">password</span>
+<span class="hljs-attr">project_domain_name</span> = <span class="hljs-string">default</span>
+<span class="hljs-attr">user_domain_name</span> = <span class="hljs-string">default</span>
+<span class="hljs-attr">region_name</span> = <span class="hljs-string">RegionOne</span>
+<span class="hljs-attr">project_name</span> = <span class="hljs-string">service</span>
+<span class="hljs-attr">username</span> = <span class="hljs-string">nova</span>
+<span class="hljs-attr">password</span> = <span class="hljs-string">nova(nova用户密码)</span>
+
+<span class="hljs-attr">[oslo_concurrency]</span>
+<span class="hljs-attr">lock_path</span> = <span class="hljs-string">/var/lib/neutron/tmp</span></code></pre></div>
+
+<h5 id="vim-x2F-etc-x2F-neutron-x2F-plugins-x2F-ml2-x2F-ml2-conf-ini"><a href="#vim-x2F-etc-x2F-neutron-x2F-plugins-x2F-ml2-x2F-ml2-conf-ini" class="headerlink" title="vim &#x2F;etc&#x2F;neutron&#x2F;plugins&#x2F;ml2&#x2F;ml2_conf.ini"></a>vim &#x2F;etc&#x2F;neutron&#x2F;plugins&#x2F;ml2&#x2F;ml2_conf.ini</h5><div class="code-wrapper"><pre><code class="hljs properties"><span class="hljs-attr">[ml2]</span>
+<span class="hljs-attr">type_drivers</span> = <span class="hljs-string">flat,vlan</span>
+<span class="hljs-attr">tenant_network_types</span> =<span class="hljs-string"></span>
+<span class="hljs-attr">mechanism_drivers</span> = <span class="hljs-string">linuxbridge</span>
+<span class="hljs-attr">extension_drivers</span> = <span class="hljs-string">port_security</span>
+
+<span class="hljs-attr">[ml2_type_flat]</span>
+<span class="hljs-attr">flat_networks</span> = <span class="hljs-string">provider</span>
+
+<span class="hljs-attr">[securitygroup]</span>
+<span class="hljs-attr">enable_ipset</span> = <span class="hljs-string">true</span></code></pre></div>
+
+<h5 id="vim-x2F-etc-x2F-neutron-x2F-plugins-x2F-ml2-x2F-linuxbridge-agent-ini"><a href="#vim-x2F-etc-x2F-neutron-x2F-plugins-x2F-ml2-x2F-linuxbridge-agent-ini" class="headerlink" title="vim &#x2F;etc&#x2F;neutron&#x2F;plugins&#x2F;ml2&#x2F;linuxbridge_agent.ini"></a>vim &#x2F;etc&#x2F;neutron&#x2F;plugins&#x2F;ml2&#x2F;linuxbridge_agent.ini</h5><div class="code-wrapper"><pre><code class="hljs properties"><span class="hljs-attr">[linux_bridge]</span>
+<span class="hljs-attr">physical_interface_mappings</span> = <span class="hljs-string">provider:ens33(服务器网络接口名)</span>
+
+<span class="hljs-attr">[vxlan]</span>
+<span class="hljs-attr">enable_vxlan</span> = <span class="hljs-string">false</span>
+
+<span class="hljs-attr">[securitygroup]</span>
+<span class="hljs-attr">enable_security_group</span> = <span class="hljs-string">true</span>
+<span class="hljs-attr">firewall_driver</span> = <span class="hljs-string">neutron.agent.linux.iptables_firewall.IptablesFirewallDriver</span></code></pre></div>
+
+<h5 id="edit-kernel-supports"><a href="#edit-kernel-supports" class="headerlink" title="edit kernel supports"></a>edit kernel supports</h5><div class="code-wrapper"><pre><code class="hljs shell">modprobe br_netfilter
+
+vim /etc/sysctl.conf
+net.bridge.bridge-nf-call-iptables = 1
+net.bridge.bridge-nf-call-ip6tables = 1
+
+sysctl -p</code></pre></div>
+
+<h5 id="vim-x2F-etc-x2F-neutron-x2F-dhcp-agent-ini"><a href="#vim-x2F-etc-x2F-neutron-x2F-dhcp-agent-ini" class="headerlink" title="vim &#x2F;etc&#x2F;neutron&#x2F;dhcp_agent.ini"></a>vim &#x2F;etc&#x2F;neutron&#x2F;dhcp_agent.ini</h5><div class="code-wrapper"><pre><code class="hljs properties"><span class="hljs-attr">[DEFAULT]</span>
+<span class="hljs-attr">interface_driver</span> = <span class="hljs-string">linuxbridge</span>
+<span class="hljs-attr">dhcp_driver</span> = <span class="hljs-string">neutron.agent.linux.dhcp.Dnsmasq</span>
+<span class="hljs-attr">enable_isolated_metadata</span> = <span class="hljs-string">true</span></code></pre></div>
+
+<h5 id="vim-x2F-etc-x2F-neutron-x2F-metadata-agent-ini"><a href="#vim-x2F-etc-x2F-neutron-x2F-metadata-agent-ini" class="headerlink" title="vim &#x2F;etc&#x2F;neutron&#x2F;metadata_agent.ini"></a>vim &#x2F;etc&#x2F;neutron&#x2F;metadata_agent.ini</h5><div class="code-wrapper"><pre><code class="hljs properties"><span class="hljs-attr">[DEFAULT]</span>
+<span class="hljs-attr">nova_metadata_host</span> = <span class="hljs-string">controller</span>
+<span class="hljs-attr">metadata_proxy_shared_secret</span> = <span class="hljs-string">metadata(网络共享密码)</span></code></pre></div>
+
+<h5 id="vim-x2F-etc-x2F-nova-x2F-nova-conf"><a href="#vim-x2F-etc-x2F-nova-x2F-nova-conf" class="headerlink" title="vim &#x2F;etc&#x2F;nova&#x2F;nova.conf"></a>vim &#x2F;etc&#x2F;nova&#x2F;nova.conf</h5><div class="code-wrapper"><pre><code class="hljs properties"><span class="hljs-attr">[neutron]</span>
+<span class="hljs-attr">auth_url</span> = <span class="hljs-string">http://controller:5000</span>
+<span class="hljs-attr">auth_type</span> = <span class="hljs-string">password</span>
+<span class="hljs-attr">project_domain_name</span> = <span class="hljs-string">default</span>
+<span class="hljs-attr">user_domain_name</span> = <span class="hljs-string">default</span>
+<span class="hljs-attr">region_name</span> = <span class="hljs-string">RegionOne</span>
+<span class="hljs-attr">project_name</span> = <span class="hljs-string">service</span>
+<span class="hljs-attr">username</span> = <span class="hljs-string">neutron</span>
+<span class="hljs-attr">password</span> = <span class="hljs-string">neutron(neutron用户密码)</span>
+<span class="hljs-attr">service_metadata_proxy</span> = <span class="hljs-string">true</span>
+<span class="hljs-attr">metadata_proxy_shared_secret</span> = <span class="hljs-string">metadata(网络共享密码)</span></code></pre></div>
+
+<h3 id="Finalize-installation"><a href="#Finalize-installation" class="headerlink" title="Finalize installation"></a>Finalize installation</h3><div class="code-wrapper"><pre><code class="hljs shell">ln -s /etc/neutron/plugins/ml2/ml2_conf.ini /etc/neutron/plugin.ini
+
+su -s /bin/sh -c &quot;neutron-db-manage --config-file /etc/neutron/neutron.conf \
+  --config-file /etc/neutron/plugins/ml2/ml2_conf.ini upgrade head&quot; neutron
+
+systemctl restart openstack-nova-api.service
+
+for op in enable start status;do for service in neutron-server neutron-linuxbridge-agent neutron-dhcp-agent neutron-metadata-agent;do systemctl $op $servicel;done;done
+
+for op in enable start status;do systemctl $op neutron-l3-agent;done</code></pre></div>
+
+<h2 id="compute-1"><a href="#compute-1" class="headerlink" title="compute"></a>compute</h2><h3 id="Install-and-configure-components-6"><a href="#Install-and-configure-components-6" class="headerlink" title="Install and configure components"></a>Install and configure components</h3><div class="code-wrapper"><pre><code class="hljs shell">yum install openstack-neutron-linuxbridge ebtables ipset -y</code></pre></div>
+
+<h4 id="vim-x2F-etc-x2F-neutron-x2F-neutron-conf-1"><a href="#vim-x2F-etc-x2F-neutron-x2F-neutron-conf-1" class="headerlink" title="vim &#x2F;etc&#x2F;neutron&#x2F;neutron.conf"></a>vim &#x2F;etc&#x2F;neutron&#x2F;neutron.conf</h4><div class="code-wrapper"><pre><code class="hljs properties"><span class="hljs-attr">[DEFAULT]</span>
+<span class="hljs-attr">transport_url</span> = <span class="hljs-string">rabbit://openstack:openstack@controller</span>
+<span class="hljs-attr">auth_strategy</span> = <span class="hljs-string">keystone</span>
+
+<span class="hljs-attr">[keystone_authtoken]</span>
+<span class="hljs-attr">www_authenticate_uri</span> = <span class="hljs-string">http://controller:5000</span>
+<span class="hljs-attr">auth_url</span> = <span class="hljs-string">http://controller:5000</span>
+<span class="hljs-attr">memcached_servers</span> = <span class="hljs-string">controller:11211</span>
+<span class="hljs-attr">auth_type</span> = <span class="hljs-string">password</span>
+<span class="hljs-attr">project_domain_name</span> = <span class="hljs-string">default</span>
+<span class="hljs-attr">user_domain_name</span> = <span class="hljs-string">default</span>
+<span class="hljs-attr">project_name</span> = <span class="hljs-string">service</span>
+<span class="hljs-attr">username</span> = <span class="hljs-string">neutron</span>
+<span class="hljs-attr">password</span> = <span class="hljs-string">neutron(neutron用户密码)</span>
+
+<span class="hljs-attr">[oslo_concurrency]</span>
+<span class="hljs-attr">lock_path</span> = <span class="hljs-string">/var/lib/neutron/tmp</span></code></pre></div>
+
+<h4 id="Provider-networks-1"><a href="#Provider-networks-1" class="headerlink" title="Provider networks"></a><a target="_blank" rel="noopener" href="https://docs.openstack.org/neutron/train/install/compute-install-option1-rdo.html">Provider networks</a></h4><h5 id="vim-x2F-etc-x2F-neutron-x2F-plugins-x2F-ml2-x2F-linuxbridge-agent-ini-1"><a href="#vim-x2F-etc-x2F-neutron-x2F-plugins-x2F-ml2-x2F-linuxbridge-agent-ini-1" class="headerlink" title="vim &#x2F;etc&#x2F;neutron&#x2F;plugins&#x2F;ml2&#x2F;linuxbridge_agent.ini"></a>vim &#x2F;etc&#x2F;neutron&#x2F;plugins&#x2F;ml2&#x2F;linuxbridge_agent.ini</h5><div class="code-wrapper"><pre><code class="hljs properties"><span class="hljs-attr">[linux_bridge]</span>
+<span class="hljs-attr">physical_interface_mappings</span> = <span class="hljs-string">provider:ens33(服务器网络接口名)</span>
+
+<span class="hljs-attr">[vxlan]</span>
+<span class="hljs-attr">enable_vxlan</span> = <span class="hljs-string">false</span>
+
+<span class="hljs-attr">[securitygroup]</span>
+<span class="hljs-attr">enable_security_group</span> = <span class="hljs-string">true</span>
+<span class="hljs-attr">firewall_driver</span> = <span class="hljs-string">neutron.agent.linux.iptables_firewall.IptablesFirewallDriver</span></code></pre></div>
+
+<h5 id="edit-kernel-supports-1"><a href="#edit-kernel-supports-1" class="headerlink" title="edit kernel supports"></a>edit kernel supports</h5><div class="code-wrapper"><pre><code class="hljs shell">modprobe br_netfilter
+
+vim /etc/sysctl.conf
+net.bridge.bridge-nf-call-iptables = 1
+net.bridge.bridge-nf-call-ip6tables = 1
+
+sysctl -p</code></pre></div>
+
+<h4 id="vim-x2F-etc-x2F-nova-x2F-nova-conf-1"><a href="#vim-x2F-etc-x2F-nova-x2F-nova-conf-1" class="headerlink" title="vim &#x2F;etc&#x2F;nova&#x2F;nova.conf"></a>vim &#x2F;etc&#x2F;nova&#x2F;nova.conf</h4><div class="code-wrapper"><pre><code class="hljs properties"><span class="hljs-attr">[neutron]</span>
+<span class="hljs-attr">auth_url</span> = <span class="hljs-string">http://controller:5000</span>
+<span class="hljs-attr">auth_type</span> = <span class="hljs-string">password</span>
+<span class="hljs-attr">project_domain_name</span> = <span class="hljs-string">default</span>
+<span class="hljs-attr">user_domain_name</span> = <span class="hljs-string">default</span>
+<span class="hljs-attr">region_name</span> = <span class="hljs-string">RegionOne</span>
+<span class="hljs-attr">project_name</span> = <span class="hljs-string">service</span>
+<span class="hljs-attr">username</span> = <span class="hljs-string">neutron</span>
+<span class="hljs-attr">password</span> = <span class="hljs-string">neutron(neutron用户密码)</span></code></pre></div>
+
+<h3 id="Finalize-installation-1"><a href="#Finalize-installation-1" class="headerlink" title="Finalize installation"></a>Finalize installation</h3><div class="code-wrapper"><pre><code class="hljs shell">systemctl restart openstack-nova-compute
+
+for op in enable start status;do systemctl $op neutron-linuxbridge-agent;done</code></pre></div>
+
+<h2 id="Verify-operation-4"><a href="#Verify-operation-4" class="headerlink" title="Verify operation"></a>Verify operation</h2><div class="code-wrapper"><pre><code class="hljs shell">. admin-openrc</code></pre></div>
+
+<h3 id="Provider-networks-2"><a href="#Provider-networks-2" class="headerlink" title="Provider networks"></a><a target="_blank" rel="noopener" href="https://docs.openstack.org/neutron/train/install/verify-option1.html">Provider networks</a></h3><div class="code-wrapper"><pre><code class="hljs shell">openstack extension list --network</code></pre></div>
+
+<h3 id="Self-service-networks"><a href="#Self-service-networks" class="headerlink" title="Self-service networks"></a><a target="_blank" rel="noopener" href="https://docs.openstack.org/neutron/train/install/verify-option2.html">Self-service networks</a></h3><div class="code-wrapper"><pre><code class="hljs shell">openstack network agent list</code></pre></div>
+
+<h1 id="Cinder-installation-for-Train"><a href="#Cinder-installation-for-Train" class="headerlink" title="Cinder installation for Train"></a><a target="_blank" rel="noopener" href="https://docs.openstack.org/cinder/train/install/">Cinder installation for Train</a></h1><h2 id="controller-4"><a href="#controller-4" class="headerlink" title="controller"></a>controller</h2><h3 id="Prerequisites-6"><a href="#Prerequisites-6" class="headerlink" title="Prerequisites"></a>Prerequisites</h3><h4 id="Create-Database-4"><a href="#Create-Database-4" class="headerlink" title="Create Database"></a>Create Database</h4><div class="code-wrapper"><pre><code class="hljs shell">mysql -u root -p123456
+
+CREATE DATABASE cinder;
+
+GRANT ALL PRIVILEGES ON cinder.* TO &#x27;cinder&#x27;@&#x27;localhost&#x27; \
+  IDENTIFIED BY &#x27;cinder&#x27;;
+GRANT ALL PRIVILEGES ON cinder.* TO &#x27;cinder&#x27;@&#x27;%&#x27; \
+  IDENTIFIED BY &#x27;cinder&#x27;;
+
+exit;</code></pre></div>
+
+<h4 id="Configure-User-and-Endpoints-4"><a href="#Configure-User-and-Endpoints-4" class="headerlink" title="Configure User and Endpoints"></a>Configure User and Endpoints</h4><div class="code-wrapper"><pre><code class="hljs shell">. admin-openrc
+<span class="hljs-meta prompt_"></span>
+<span class="hljs-meta prompt_">#</span><span class="language-bash">设置cinder用户密码</span>
+openstack user create --domain default --password-prompt cinder
+
+openstack role add --project service --user cinder admin
+
+openstack service create --name cinderv2 \
+  --description &quot;OpenStack Block Storage&quot; volumev2
+openstack service create --name cinderv3 \
+  --description &quot;OpenStack Block Storage&quot; volumev3
+
+openstack endpoint create --region RegionOne \
+  volumev2 public http://controller:8776/v2/%\(project_id\)s
+openstack endpoint create --region RegionOne \
+  volumev2 internal http://controller:8776/v2/%\(project_id\)s
+openstack endpoint create --region RegionOne \
+  volumev2 admin http://controller:8776/v2/%\(project_id\)s
+
+openstack endpoint create --region RegionOne \
+  volumev3 public http://controller:8776/v3/%\(project_id\)s
+openstack endpoint create --region RegionOne \
+  volumev3 internal http://controller:8776/v3/%\(project_id\)s
+openstack endpoint create --region RegionOne \
+  volumev3 admin http://controller:8776/v3/%\(project_id\)s</code></pre></div>
+
+<h3 id="Install-and-configure-components-7"><a href="#Install-and-configure-components-7" class="headerlink" title="Install and configure components"></a>Install and configure components</h3><div class="code-wrapper"><pre><code class="hljs shell">yum install openstack-cinder -y
+
+vim /etc/cinder/cinder.conf
+[DEFAULT]
+transport_url = rabbit://openstack:openstack@controller
+auth_strategy = keystone
+my_ip = 10.10.10.101
+[database]
+connection = mysql+pymysql://cinder:cinder@controller/cinder
+[keystone_authtoken]
+www_authenticate_uri = http://controller:5000
+auth_url = http://controller:5000
+memcached_servers = controller:11211
+auth_type = password
+project_domain_name = default
+user_domain_name = default
+project_name = service
+username = cinder
+password = cinder(cinder用户密码)
+[oslo_concurrency]
+lock_path = /var/lib/cinder/tmp
+
+su -s /bin/sh -c &quot;cinder-manage db sync&quot; cinder</code></pre></div>
+
+<h3 id="Configure-Compute-to-use-Block-Storage"><a href="#Configure-Compute-to-use-Block-Storage" class="headerlink" title="Configure Compute to use Block Storage["></a>Configure Compute to use Block Storage[</h3><div class="code-wrapper"><pre><code class="hljs shell">vim /etc/nova/nova.conf
+[cinder]
+os_region_name = RegionOne</code></pre></div>
+
+<h3 id="Finalize-installation-2"><a href="#Finalize-installation-2" class="headerlink" title="Finalize installation"></a>Finalize installation</h3><div class="code-wrapper"><pre><code class="hljs shell">for op in restart status;do systemctl $op openstack-nova-api;done
+
+for op in enable restart status;do for service in openstack-cinder-api openstack-cinder-scheduler;do systemctl $op $service;done;done</code></pre></div>
+
+<h2 id="block"><a href="#block" class="headerlink" title="block"></a>block</h2><h3 id="Prerequisites-7"><a href="#Prerequisites-7" class="headerlink" title="Prerequisites"></a>Prerequisites</h3><div class="code-wrapper"><pre><code class="hljs shell">yum install lvm2 device-mapper-persistent-data
+
+for op in enable start status;do systemctl $op lvm2-lvmetad;done
+
+pvcreate /dev/sdb
+
+vgcreate cinder-volumes /dev/sdb
+
+vim /etc/lvm/lvm.conf
+devices &#123;
+...
+filter = [ &quot;a/sdb/&quot;, &quot;r/.*/&quot;]</code></pre></div>
+
+<h3 id="Install-and-configure-components-8"><a href="#Install-and-configure-components-8" class="headerlink" title="Install and configure components"></a>Install and configure components</h3><div class="code-wrapper"><pre><code class="hljs shell">yum install openstack-cinder targetcli python-keystone -y
+
+vim /etc/cinder/cinder.conf
+[DEFAULT]
+auth_strategy = keystone
+transport_url = rabbit://openstack:openstack@controller
+my_ip = 10.10.10.103
+enabled_backends = lvm
+glance_api_servers = http://controller:9292
+[database]
+connection = mysql+pymysql://cinder:cinder@controller/cinder
+[keystone_authtoken]
+www_authenticate_uri = http://controller:5000
+auth_url = http://controller:5000
+memcached_servers = controller:11211
+auth_type = password
+project_domain_name = default
+user_domain_name = default
+project_name = service
+username = cinder
+password = cinder
+[lvm]
+volume_driver = cinder.volume.drivers.lvm.LVMVolumeDriver
+volume_group = cinder-volumes
+target_protocol = iscsi
+target_helper = lioadm
+[oslo_concurrency]
+lock_path = /var/lib/cinder/tmp</code></pre></div>
+
+<h3 id="Finalize-installation-3"><a href="#Finalize-installation-3" class="headerlink" title="Finalize installation"></a>Finalize installation</h3><div class="code-wrapper"><pre><code class="hljs shell">for op in enable restart status;do for service in openstack-cinder-volume target;do systemctl $op $service;done;done</code></pre></div>
+
+<h2 id="Verify-Cinder-operation"><a href="#Verify-Cinder-operation" class="headerlink" title="Verify Cinder operation"></a>Verify Cinder operation</h2><div class="code-wrapper"><pre><code class="hljs shell">. admin-openrc
+openstack volume service list</code></pre></div>
+
+<h1 id="Horizon-installation-for-Train"><a href="#Horizon-installation-for-Train" class="headerlink" title="Horizon installation for Train"></a><a target="_blank" rel="noopener" href="https://docs.openstack.org/horizon/train/install/">Horizon installation for Train</a></h1><h2 id="Install-and-configure-components-9"><a href="#Install-and-configure-components-9" class="headerlink" title="Install and configure components"></a>Install and configure components</h2><div class="code-wrapper"><pre><code class="hljs shell">yum install openstack-dashboard -y
+
+vim /etc/openstack-dashboard/local_settings
+
+OPENSTACK_HOST = &quot;controller&quot;
+ALLOWED_HOSTS = [&#x27;*&#x27;]
+SESSION_ENGINE = &#x27;django.contrib.sessions.backends.cache&#x27;
+CACHES = &#123;
+    &#x27;default&#x27;: &#123;
+         &#x27;BACKEND&#x27;: &#x27;django.core.cache.backends.memcached.MemcachedCache&#x27;,
+         &#x27;LOCATION&#x27;: &#x27;controller:11211&#x27;,
+    &#125;
+&#125;
+OPENSTACK_KEYSTONE_URL = &quot;http://%s:5000/v3&quot; % OPENSTACK_HOST
+OPENSTACK_KEYSTONE_MULTIDOMAIN_SUPPORT = True
+OPENSTACK_API_VERSIONS = &#123;
+    &quot;identity&quot;: 3,
+    &quot;image&quot;: 2,
+    &quot;volume&quot;: 3,
+&#125;
+OPENSTACK_KEYSTONE_DEFAULT_DOMAIN = &quot;Default&quot;
+OPENSTACK_KEYSTONE_DEFAULT_ROLE = &quot;user&quot;
+OPENSTACK_NEUTRON_NETWORK = &#123;
+    ...
+    &#x27;enable_router&#x27;: False,
+    &#x27;enable_quotas&#x27;: False,
+    &#x27;enable_distributed_router&#x27;: False,
+    &#x27;enable_ha_router&#x27;: False,
+    &#x27;enable_lb&#x27;: False,
+    &#x27;enable_firewall&#x27;: False,
+    &#x27;enable_vpn&#x27;: False,
+    &#x27;enable_fip_topology_check&#x27;: False,
+&#125;
+TIME_ZONE = &quot;Asia/Shanghai&quot;
+WEBROOT = &#x27;/dashboard/&#x27;
+
+vim  /etc/httpd/conf.d/openstack-dashboard.conf
+WSGIApplicationGroup %&#123;GLOBAL&#125;</code></pre></div>
+
+<h2 id="Finalize-installation-4"><a href="#Finalize-installation-4" class="headerlink" title="Finalize installation"></a>Finalize installation</h2><div class="code-wrapper"><pre><code class="hljs shell">systemctl restart httpd.service memcached.service
+<span class="hljs-meta prompt_">#</span><span class="language-bash">访问http://主控节点IP/dashboard/,域:default</span></code></pre></div>
+
+<h1 id="Launch-an-instance（可以通过dashboard实现）"><a href="#Launch-an-instance（可以通过dashboard实现）" class="headerlink" title="Launch an instance（可以通过dashboard实现）"></a>Launch an instance（可以通过dashboard实现）</h1><h2 id="Create-virtual-networks"><a href="#Create-virtual-networks" class="headerlink" title="Create virtual networks"></a>Create virtual networks</h2><h3 id="Provider-network"><a href="#Provider-network" class="headerlink" title="Provider network"></a>Provider network</h3><div class="code-wrapper"><pre><code class="hljs shell">. admin-openrc
+
+openstack network create  --share --external \
+  --provider-physical-network provider \
+  --provider-network-type flat provider
+
+openstack subnet create --network provider \
+  --allocation-pool start=192.168.40.101,end=192.168.40.250 \
+  --dns-nameserver 8.8.8.8 --gateway 192.168.40.1 \
+  --subnet-range 192.168.40.0/24 provider</code></pre></div>
+
+<h3 id="Self-service-network"><a href="#Self-service-network" class="headerlink" title="Self-service network"></a>Self-service network</h3><div class="code-wrapper"><pre><code class="hljs shell">. demo-openrc
+
+openstack network create selfservice
+
+openstack subnet create --network selfservice \
+  --dns-nameserver 8.8.4.4 --gateway 172.16.1.1 \
+  --subnet-range 172.16.1.0/24 selfservice
+
+openstack router create router
+openstack router add subnet router selfservice
+openstack router set router --external-gateway provider
+
+. admin-openrc
+ip netns
+openstack port list --router router</code></pre></div>
+
+<h2 id="Create-m1-nano-flavor"><a href="#Create-m1-nano-flavor" class="headerlink" title="Create m1.nano flavor"></a>Create m1.nano flavor</h2><div class="code-wrapper"><pre><code class="hljs shell">for op in enable satrt status;do for service in libvirtd openstack-nova-compute;do systemctl $op $service;done;done
+
+openstack flavor create --id 0 --vcpus 1 --ram 64 --disk 1 m1.nano
+openstack flavor create --id 0 --vcpus 1 --ram 1024 --disk 10 m2.nano</code></pre></div>
+
+<h2 id="Generate-a-key-pair"><a href="#Generate-a-key-pair" class="headerlink" title="Generate a key pair"></a>Generate a key pair</h2><div class="code-wrapper"><pre><code class="hljs gradle">. demo-openrc
+ssh-keygen -q -N <span class="hljs-string">&quot;&quot;</span>
+openstack keypair create --<span class="hljs-keyword">public</span>-key ~<span class="hljs-regexp">/.ssh/i</span>d_rsa.pub mykey
+openstack keypair list</code></pre></div>
+
+<h2 id="Add-security-group-rules"><a href="#Add-security-group-rules" class="headerlink" title="Add security group rules"></a>Add security group rules</h2><div class="code-wrapper"><pre><code class="hljs shell">openstack security group rule create --proto icmp default
+openstack security group rule create --proto tcp --dst-port 22 default</code></pre></div>
+
+<h2 id="Launch-an-instance"><a href="#Launch-an-instance" class="headerlink" title="Launch an instance"></a>Launch an instance</h2><h3 id="Provider-network-1"><a href="#Provider-network-1" class="headerlink" title="Provider network"></a>Provider network</h3><div class="code-wrapper"><pre><code class="hljs shell">. demo-openrc
+openstack flavor list
+openstack image list
+openstack network list
+openstack security group list
+
+openstack server create --flavor m1.nano --image cirros \
+  --nic net-id=PROVIDER_NET_ID --security-group default \
+  --key-name mykey provider-instance
+openstack server list
+openstack console url show provider-instance</code></pre></div>
+
+<h3 id="Self-service-network-1"><a href="#Self-service-network-1" class="headerlink" title="Self-service network"></a>Self-service network</h3><div class="code-wrapper"><pre><code class="hljs shell">openstack server create --flavor m1.nano --image cirros \
+  --nic net-id=b364d40b-0e57-4b32-9949-db83666f0f57 --security-group default \
+  --key-name mykey newserver</code></pre></div>
+
+<h2 id="修改实例默认密码-controller"><a href="#修改实例默认密码-controller" class="headerlink" title="修改实例默认密码(controller)"></a>修改实例默认密码(controller)</h2><div class="code-wrapper"><pre><code class="hljs shell">vim /etc/nova/nova.conf
+inject_password=True
+
+vim /etc/openstack-dashboard/local_settings
+OPENSTACK_HYPERVISOR_FEATURES = &#123;
+&#x27;can_set_password&#x27;: True
+&#125;
+
+systemctl restart openstack-nova-*
+<span class="hljs-meta prompt_"></span>
+<span class="hljs-meta prompt_">#</span><span class="language-bash">创建实例时写入以下脚本，并勾选配置驱动</span>
+<span class="hljs-meta prompt_">#</span><span class="language-bash">!/bin/bash</span>
+passwd root&lt;&lt;EOF
+123456
+123456
+EOF</code></pre></div>
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/study/" class="category-chain-item">study</a>
+  
+  
+    <span>></span>
+    
+  <a href="/categories/study/others/" class="category-chain-item">others</a>
+  
+  
+
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>手动部署Train版OpenStack</div>
+      <div>http://example.com/study/others/Openstack-Train/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>Felix Cheung</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2022年12月22日</div>
+        </div>
+      
+      
+      
+        <div class="license-meta-item">
+          <div>许可协议</div>
+          <div>
+            
+              
+              
+                <a target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-by"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/study/others/Commands/" title="Commands">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">Commands</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>目录</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+    </div>
+  
+  
+    <div class="statistics">
+  
+  
+
+  
+    
+      <span id="busuanzi_container_site_pv" style="display: none">
+        总访问量 
+        <span id="busuanzi_value_site_pv"></span>
+         次
+      </span>
+    
+    
+      <span id="busuanzi_container_site_uv" style="display: none">
+        总访客数 
+        <span id="busuanzi_value_site_uv"></span>
+         人
+      </span>
+    
+    
+  
+</div>
+
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.0/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.18.2/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init(Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc));
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+      }
+    });
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.11/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/4.3.1/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script  src="/js/local-search.js" ></script>
+
+  <script defer src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>
