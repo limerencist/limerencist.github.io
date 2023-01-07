@@ -165,6 +165,17 @@
   
   
   <entry>
+    <title>分類</title>
+    <link href="/"/>
+    <url>/</url>
+    
+    <content type="html"><![CDATA[]]></content>
+    
+  </entry>
+  
+  
+  
+  <entry>
     <title>相冊</title>
     <link href="/"/>
     <url>/</url>
@@ -177,17 +188,6 @@
   
   <entry>
     <title>標簽</title>
-    <link href="/"/>
-    <url>/</url>
-    
-    <content type="html"><![CDATA[]]></content>
-    
-  </entry>
-  
-  
-  
-  <entry>
-    <title>分類</title>
     <link href="/"/>
     <url>/</url>
     
