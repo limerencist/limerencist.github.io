@@ -8,7 +8,7 @@
     <link href="/gibberish/tipsy/Preface/"/>
     <url>/gibberish/tipsy/Preface/</url>
     
-    <content type="html"><![CDATA[<p>也許是終於將博客搭好，也許純粹因爲年紀上來，將平日偶爾寫的細碎東西整理在一起，算是我今年想做好的一件事。</p><p>真的要算起來，從初高中寫起，哪怕沒有十萬也有個七、八萬字：詩詞歌賦、散文評論、隨筆小説，還是挺雜糅的，不過都被自己刪去，所剩無幾，原因只是回頭翻閲時不忍細看。大學看高中的如此，工作后看大學亦如是，每個階段看之前的，都不對勁。現在要解決這個問題的方法也簡單，眼不見心不煩，反正寫完傳到github，有錯別字也不管不顧——沒有必要再commit一次。</p><p>“淺斟”二字，自然是從柳三變的《鶴衝天》來的，當然我也沒有什麽浮名可以拿來換的，也就能在回到家中時，在縮于被窩時，在愜意休憩時，在愉快活動時，倒一小杯酒淺嘗輒止。其次，也包含著五柳先生的點到即止、不求甚解——如果事事都去反復思量，考慮今是昨非，那豈不是給庸人自擾？</p><p>風過留聲，雁過留痕，人活著總要留下點什麽。無錢無名，無權無人，也就這些零落如鴻爪的隻言片語，供諸君一饗（一哂）。</p><hr /><p align="right"> 腹稿于壬寅葭月 </p><div style="text-align: right"> 成稿于壬寅冰月 </div>]]></content>
+    <content type="html"><![CDATA[<p>    也許是終於將博客搭好，也許純粹因爲年紀上來，將平日偶爾寫的細碎東西整理在一起，算是我今年想做好的一件事。</p><p>    真的要算起來，從初高中寫起，哪怕沒有十萬也有個七、八萬字：詩詞歌賦、散文評論、隨筆小説，還是挺雜糅的，不過都被自己刪去，所剩無幾，原因只是回頭翻閲時不忍細看。大學看高中的如此，工作后看大學亦如是，每個階段看之前的，都不對勁。現在要解決這個問題的方法也簡單，眼不見心不煩，反正寫完傳到github，有錯別字也不管不顧——沒有必要再commit一次。</p><p>    “淺斟”二字，自然是從柳三變的《鶴衝天》來的，當然我也沒有什麽浮名可以拿來換的，也就能在回到家中時，在縮于被窩時，在愜意休憩時，在愉快活動時，倒一小杯酒淺嘗輒止。其次，也包含著五柳先生的點到即止、不求甚解——如果事事都去反復思量，考慮今是昨非，那豈不是給庸人自擾？</p><p>    風過留聲，雁過留痕，人活著總要留下點什麽。無錢無名，無權無人，也就這些零落如鴻爪的隻言片語，供諸君一饗——或是一哂。</p><hr /><p align="right"> 腹稿于壬寅葭月 </p><div style="text-align: right"> 成稿于壬寅冰月 </div>]]></content>
     
     
     <categories>
@@ -208,18 +208,7 @@
     <link href="/"/>
     <url>/</url>
     
-    <content type="html"><![CDATA[]]></content>
-    
-  </entry>
-  
-  
-  
-  <entry>
-    <title>分類</title>
-    <link href="/"/>
-    <url>/</url>
-    
-    <content type="html"><![CDATA[]]></content>
+    <content type="html"><![CDATA[<div style="text-align: center"><p>無錫卅年土著<br />平時喜好讀書<br />跟隨貓咪腳步<br />生活並不孤獨</p><p>玩過一陣鋼筆<br />燒過兩年耳機<br />追過livehouse<br />去過酒吧蹦迪</p><p>最近沉迷鍵盤<br />間中買買模玩<br />深愛香港樂壇<br />週末遠足登山</p></div><p>    博客的95%終於搭好了，剩下的5%估計又要拖延……</p><p>    至於搭博客的原因：一部分是最近比較閑，有時間可以玩一玩，看到大佬都有自己的博客，也隨調研了一下各個開源框架，最終敲定了Hexo——主要還是相比較其它傻瓜式操作，Hexo顯得比較硬核，能體現出我是個搞技術的；其次是足夠成熟，用的人也多，有問題也容易解決；再就是有花里胡哨的主題，一年365天1天換一套都不是問題。畢竟人嘛，總是會厭的，一天換一套太麻煩的話，一個月換一套也行。</p><p>    二來，就是確確實實想留下一點不能説毫無價值只能説意義不大的東西：前面説了，我是個搞技術的，搞技術的總得有筆記和文章證明吧，不然空口無憑誰信啊？以後換工作，給人貼GitHub Page地址也能順便瞭解一下我的實力；除了技術和學習相關的 ，也趁這個機會把平日偶爾寫的，記錄生活或者評論感想的細碎東西整理在一起，給大型同性別交友平臺GitHub托管我也比較放心。</p><p>    博客的名稱既然是Mucy’s Live，那當然要放些mucy和live的照片——只不過，得等我搞定了圖床再説，這就是開始説的5%中的部分内容啦。</p><p>    先到這裏，溜了溜了……</p>]]></content>
     
   </entry>
   
@@ -231,6 +220,17 @@
     <url>/</url>
     
     <content type="html"><![CDATA[<h1 id="mucy"><a class="markdownIt-Anchor" href="#mucy"></a> Mucy</h1><p><img src="https://tva3.sinaimg.cn/large/6833939bly1giclfdu6exj20zk0m87hw.jpg" alt="" title="这里是 title" /><br /><img src="https://tva3.sinaimg.cn/large/6833939bly1giclflwv2aj20zk0m84qp.jpg" alt="" /><br /><img src="https://tva3.sinaimg.cn/large/6833939bly1giclg5ms2rj20zk0m8u0x.jpg" alt="" /><br /><img src="https://tva3.sinaimg.cn/large/6833939bly1giclhnx9glj20zk0m8npd.jpg" alt="" /><br />{.gallery data-height=“120”}</p><h1 id="live"><a class="markdownIt-Anchor" href="#live"></a> Live</h1><p><img src="https://tva3.sinaimg.cn/large/6833939bly1gicitht3xtj20zk0m8k5v.jpg" alt="" /><br /><img src="https://tva3.sinaimg.cn/large/6833939bly1giclil3m4ej20zk0m8tn8.jpg" alt="" /><br /><img src="https://tva3.sinaimg.cn/large/6833939bly1gicljgocqbj20zk0m8e81.jpg" alt="" /><br /><img src="https://tva3.sinaimg.cn/large/6833939bly1gipetfk5zwj20zk0m8e81.jpg" alt="" /><br />{.gallery data-height=“120”}</p>]]></content>
+    
+  </entry>
+  
+  
+  
+  <entry>
+    <title>分類</title>
+    <link href="/"/>
+    <url>/</url>
+    
+    <content type="html"><![CDATA[]]></content>
     
   </entry>
   
